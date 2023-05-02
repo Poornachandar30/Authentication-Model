@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script >
+   const toggleForm = () => {
+   const container = document.querySelector('.container');
+   console.log(container.classList);
+   container.classList.toggle('active');
+   console.log(container.classList);
+
+};
+document.addEventListener("DOMContentLoaded", function(event) { 
+  toggleForm();
+});    
+
+const register = () =>{
+  const formData = {
+    name: document.getElementById("userName").value,
+    email: document.getElementById("email").value,
+    password: document.getElementById("password").value,
+  }
+console.log("pass confmpass", formData.password, document.getElementById("confirmPassword").value)
+  if (formData.password != document.getElementById("confirmPassword").value){
+     alert("Password doesn't match")
+      return false
+  } 
+
+  $.ajax({
+    url: "http://localhost:8080/register",
+    method: "POST",
+    data: JSON.stringify(formData),
+    dataType: "json",
+    contentType: "application/json",
+    success: function(response) {
+        console.log("Response received:", response);
+        document.getElementById("userName").value="",
+        document.getElementById("email").value="",
+        document.getElementById("password").value="",
+        document.getElementById("confirmPassword").value="",
+        toggleForm()
+    },
+    error: function(xhr, status, error) {
+        console.error("Error occurred:", error);
+    }
+});
+
+}
+
+const loginUser = () =>{
+
+  const loginForm = {
+    email : document.getElementById("loginName").value,
+    password : document.getElementById("loginPass").value
+  }
+
+  $.ajax({
+    url: "http://localhost:8080/login",
+    method: "POST",
+    data: JSON.stringify(loginForm),
+    dataType: "json",
+    contentType: "application/json",
+    success: function(response) {
+        console.log("Response received:", response);
+        document.getElementById("loginName").value ="",
+        document.getElementById("loginPass").value =""
+        localStorage.setItem('token', response.authToken);
+        const user = document.getElementsByClassName("user")
+        user[0].innerHTML=""
+        user[1].innerHTML=""
+        document.getElementById("profile").innerHTML="<h1>Your Profile</h1>"
+
+        $.ajax({
+        url: "http://localhost:8080/profile",
+        type: "GET",
+        headers: {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODMwOTk1MzAsInVzZXJJZCI6IjM0In0.k7M3d5QTRu7yNSk8nKC3d_qoCdDHI6hgcta4XJ5Yw70"
+  },
+        success: function(response) {
+        console.log(response);
+      },
+        error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+    }
+  });
+
+        //API call here
+
+    },
+    error: function(xhr, status, error) {
+        console.error("Error occurred:", error);
+    }
+});
+
+}
+</script>
+  </head>
+  
+    <body>
+        <section>
+          <div id="container" class="container">
+            <div class="user signinBx">
+              <div class="formBx">
+                <form action="" onsubmit="return false;">
+                  <h2>Sign In</h2>
+                  <input type="text" name="loginName" id="loginName" placeholder="Username" />
+                  <input type="password" name="loginPass" id="loginPass" placeholder="Password" />
+                  <input type="submit" name="" value="Login" onclick="loginUser()"/>
+                  <p class="signup">
+                    Don't have an account ?
+                    <a href="#" onclick="toggleForm();">Sign Up.</a>
+                  </p>
+                </form>
+              </div>
+            </div>
+            <div class="user signupBx">
+              <div class="formBx">
+                <form id="myForm" onsubmit="return false;">
+                  <h2>Create an account</h2>
+                  <input type="text" name="userName" id="userName" placeholder="Username" />
+                  <input type="email" name="email" id="email" placeholder="Email Address" />
+                  <input type="password" name="" name="password" id="password" placeholder="Create Password" />
+                  <input type="password" name="" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" />
+                  <input type="submit" name="" value="Sign Up" onclick="register();"/>
+                  <p class="signup">
+                    Already have an account ?
+                    <a href="#" onclick="toggleForm();">Sign in.</a>
+                  </p>
+                </form>
+              </div>
+            </div>
+            <div id="profile" class="profile">
+            </div>
+            
+          </div>
+
+         
+
+        </section>
+      </body>
+
+  
+</html>
